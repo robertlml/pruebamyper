@@ -1,0 +1,64 @@
+﻿@model List<PruebMyper.Models.Trabajadore>
+
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div class="card">
+    <div class="card-header">
+        <h5>Lista de Trabajadores</h5>
+    </div>
+    <div class="card-body">
+        <a class="btn btn-success btn-sm" asp-action="Trabajador_Detalle" asp-controller="Home" asp-route-idTrabajador="0">Crear Nuevo</a>
+        <hr />
+        <table class="table table-striped">
+            <thead>
+                <tr>
+
+                    <th>TipoDocumento</th>
+                    <th>NumeroDocumento</th>
+                    <th>Nombres</th>
+                    <th>Sexo</th>
+                    <th>Departamento</th>
+                    <th>Provincia</th>
+                    <th>Distrito</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr style="background-color: @(item.Sexo == "M" ? "blue" : "orange")">
+                        <td>@item.TipoDocumento</td>
+                        <td>@item.NumeroDocumento</td>
+                        <td>@item.Nombres</td>
+                        <td>@item.Sexo</td>
+                        <td>@item.oDepartamento.NombreDepartamento</td>
+                        <td>@item.oProvincia.NombreProvincia</td>
+                        <td>@item.oDistrito.NombreDistrito</td>
+
+                        <td>
+                            <a class="btn btn-primary btn-sm" asp-action="Trabajador_Detalle" asp-controller="Home" asp-route-idTrabajador="@item.Id">Editar</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-danger btn-sm" asp-action="Eliminar" asp-controller="Home" asp-route-idTrabajador="@item.Id">Eliminar</a>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

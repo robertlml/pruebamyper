@@ -1,0 +1,179 @@
+﻿@model PruebMyper.Models.ViewModels.TrabajadorVM
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+
+
+@{
+    ViewData["Title"] = "Trabajador_Detalle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@if (Model.oTrabajador.Id == 0)
+{
+    <h1> Crear Trabajador</h1>
+
+}
+else
+{
+    <h1>Editar Trabajador</h1>
+}
+
+
+<div class="row">
+    <div class="col-sm-4">
+        <form asp-action="Trabajador_Detalle" asp-controller="Home" method="post">
+            <input type="hidden" asp-for="oTrabajador.Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label class="form-label">TipoDocumento</label>
+                <select class="form-select form-select-sm" asp-for="oTrabajador.TipoDocumento">
+                    <option value="DNI">DNI</option>
+                    <option value="P">Pasaporte</option>
+                    <option value="C">Carnet de Extranjería</option>
+                </select>
+                <span asp-validation-for="oTrabajador.TipoDocumento" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">NumeroDocumento</label>
+                <input class="form-control form-control-sm" asp-for="oTrabajador.NumeroDocumento" type="text" />
+                <span asp-validation-for="oTrabajador.NumeroDocumento" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sexo</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="oTrabajador.Sexo" value="M" />
+                    <label class="form-check-label">Masculino</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="oTrabajador.Sexo" value="F" />
+                    <label class="form-check-label">Femenino</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="oTrabajador.Nombres">Nombres</label>
+                <input class="form-control form-control-sm" asp-for="oTrabajador.Nombres" type="text" />
+                <span asp-validation-for="oTrabajador.Nombres" class="text-danger"></span>
+            </div>
+
+            <!-- Departamento -->
+            <div class="form-group mb-3">
+                <label class="form-label">Departamento</label>
+                <select id="lstDepartamento" class="form-select form-select-sm" asp-for="oTrabajador.IdDepartamento" asp-items="@Model.oListaDepartamento">
+                    <option value="" selected disabled>--Seleccionar--</option>
+                </select>
+                <span asp-validation-for="oTrabajador.IdDepartamento" class="text-danger"></span>
+            </div>
+
+            <!-- Provincia -->
+            <div class="form-group mb-3">
+                <label class="form-label">Provincia</label>
+                <select id="lstProvincia" class="form-select form-select-sm" asp-for="oTrabajador.IdProvincia" asp-items="@Model.oListaProvincia">
+                    <option value="" selected disabled>--Seleccionar--</option>
+                </select>
+                <span asp-validation-for="oTrabajador.IdProvincia" class="text-danger"></span>
+            </div>
+
+            <!-- Distrito -->
+            <div class="form-group mb-3">
+                <label class="form-label">Distrito</label>
+                <select id="lstDistrito" class="form-select form-select-sm" asp-for="oTrabajador.IdDistrito" asp-items="@Model.oListaDistrito">
+                    <option selected disabled>--Seleccionar--</option>
+                </select>
+                <span asp-validation-for="oTrabajador.IdDistrito" class="text-danger"></span>
+            </div>
+
+
+            <div class="mb-2">
+                @if (Model.oTrabajador.Id == 0)
+                {
+
+                    <button class="btn btn-primary btn-sm w-25" type="submit">Crear</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary btn-sm w-25" type="submit">Actualizar</button>
+                }
+
+                <a class="btn btn-dark btn-sm" asp-action="Index" asp-controller="Home">Regresar</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#lstDepartamento').change(function () {
+                var selectDepartamento = $("#lstDepartamento").val();
+
+                var selectProvincia = $('#lstProvincia');
+                selectProvincia.empty();
+
+                var selectDistrito = $('#lstDistrito').val();
+
+                if (selectDepartamento != null && selectDepartamento != '') {
+                    $.getJSON('@Url.Action("CargarProvincias")', { IdDepartamento: selectDepartamento }, function (prov) {
+                        if (prov != null && !jQuery.isEmptyObject(prov)) {
+                            selectProvincia.append($('<option/>', {
+                                value: null,
+                                text: "Seleccione Provincia"
+                            }));
+
+                            $.each(prov, function (index, provincia) {
+                                selectProvincia.append($('<option/>', {
+                                    value: provincia.value,
+                                    text: provincia.text
+                                }));
+                            });
+                        }
+                    })
+                }
+
+            })
+
+
+            $('#lstProvincia').change(function () {
+                var selectProvincia = $("#lstProvincia").val();
+                var selectDistrito = $('#lstDistrito');
+                selectDistrito.empty();
+
+                if (selectProvincia != null && selectProvincia != '') {
+                     $.getJSON('@Url.Action("CargarDistritos")', { IdProvincia: selectProvincia }, function (dist) {
+                    if (dist != null && !jQuery.isEmptyObject(dist)) {
+                        selectDistrito.append($('<option/>', {
+                            value: null,
+                            text: "Seleccionar Distrito"
+                }));
+
+                $.each(dist, function (index, distrito) {
+                    selectDistrito.append($('<option/>', {
+                        value: distrito.value,
+                        text: distrito.text
+                    }));
+                });
+            }
+        });
+    }
+});
+
+})
+
+    </script>
+}
+
+
